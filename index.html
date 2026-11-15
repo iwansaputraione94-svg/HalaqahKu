@@ -1,100 +1,227 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#14653d">
-  <meta name="description" content="Aplikasi pengelolaan halaqah dan setoran Al-Quran">
-  <title>HalaqahKu</title>
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
-
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #e8f5ee;
-    }
-    header {
-      background: #14653d;
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 2px 8px #0002;
-    }
-    header img { width: 42px; height: 42px; }
-    header strong { font-size: 19px; }
-    header small { display: block; opacity: .85; margin-top: 3px; }
-    main {
-      height: calc(100dvh - 66px);
-      padding: 0;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: white;
-    }
-    #install {
-      display: none;
-      margin: 10px 16px;
-      padding: 10px 16px;
-      border: 0;
-      border-radius: 8px;
-      background: #c9932f;
-      color: white;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HalaqahKu - Laporan Setoran Al-Quran</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui,Arial}
+body{margin:0;background:#f0f7f2;color:#1a2e22}
+header{background:#0f7a4d;color:#fff;padding:16px;text-align:center}
+header h1{margin:0;font-size:22px}
+header p{margin:4px 0 0;opacity:.9;font-size:13px}
+.container{max-width:900px;margin:auto;padding:12px}
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+label{font-weight:700;font-size:13px;display:block;margin:10px 0 4px}
+select,input,textarea{width:100%;padding:10px;border:1px solid #cbd5cf;border-radius:10px;font-size:15px}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer}
+.btn-hijau{background:#0f7a4d;color:#fff;width:100%}
+.btn-abu{background:#e8efea;width:100%}
+.btn-wa{background:#25D366;color:#fff;width:100%}
+.siswa{border:1px solid #dcebe2;border-radius:12px;padding:10px;margin-top:10px}
+.siswa b{font-size:16px}
+.badge{display:inline-block;background:#e6f4ec;color:#0f7a4d;padding:2px 8px;border-radius:20px;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{flex:1;background:#fff;color:#0f7a4d}
+.tabs button.active{background:#0f7a4d;color:#fff}
+.hidden{display:none}
+</style>
 </head>
-
 <body>
-  <header>
-    <img src="./icon.svg" alt="Logo HalaqahKu">
-    <div>
-      <strong>HALAQAHKU</strong>
-      <small>Aplikasi Monitoring Setoran Al-Qur'an</small>
-    </div>
-  </header>
+<header>
+<h1>🕌 HalaqahKu</h1>
+<p>Laporan Setoran Al-Quran Per Kelas & Per Halaqah</p>
+</header>
 
-  <button id="install">Pasang Aplikasi</button>
+<div class="container">
 
-  <main>
-    <iframe
-      src="https://script.google.com/macros/s/AKfycby7KpoeL40QhP9T9jD4wljooSXXdj8RR0R3UAj72ZS6MovZ02CaAlB6c4BlFHXBFrCd/exec"
-      title="Aplikasi HalaqahKu"
-      allow="clipboard-read; clipboard-write">
-    </iframe>
-  </main>
+<div class="tabs">
+<button id="tabLaporan" class="active" onclick="showTab('laporan')">Laporan</button>
+<button id="tabGuru" onclick="showTab('guru')">Manajemen Guru</button>
+<button id="tabSiswa" onclick="showTab('siswa')">Manajemen Siswa</button>
+</div>
 
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js")
-          .catch(error => console.error("Service Worker:", error));
-      });
-    }
+<!-- LAPORAN -->
+<div id="page-laporan">
+<div class="card">
+<label>Pilih Kelas</label>
+<select id="filterKelas" onchange="renderSiswa()">
+<option value="">-- Semua Kelas --</option>
+<option>VII</option><option>VIII</option><option>IX</option>
+</select>
+<label>Pilih Halaqah</label>
+<select id="filterHalaqah" onchange="renderSiswa()">
+<option value="">-- Semua Halaqah --</option>
+<option>Halaqah A</option><option>Halaqah B</option><option>Halaqah C</option><option>Halaqah D</option>
+</select>
+<label>Cari Siswa</label>
+<input id="cari" placeholder="Ketik nama siswa..." oninput="renderSiswa()">
+</div>
 
-    let installPrompt;
+<div class="card">
+<h3 style="margin:0">Daftar Siswa <span id="jml" class="badge">0 siswa</span></h3>
+<div id="listSiswa"></div>
+</div>
 
-    window.addEventListener("beforeinstallprompt", event => {
-      event.preventDefault();
-      installPrompt = event;
-      document.getElementById("install").style.display = "block";
-    });
+<div class="card">
+<h3 style="margin:0">Rekap Hari Ini</h3>
+<div id="rekap"></div>
+<button class="btn-wa" style="margin-top:10px" onclick="kirimWA()">📲 Kirim Rekap ke WA</button>
+</div>
+</div>
 
-    document.getElementById("install").addEventListener("click", async () => {
-      if (!installPrompt) return;
-      installPrompt.prompt();
-      await installPrompt.userChoice;
-      installPrompt = null;
-      document.getElementById("install").style.display = "none";
-    });
-  </script>
+<!-- GURU -->
+<div id="page-guru" class="hidden">
+<div class="card">
+<h3 style="margin:0">Tambah Guru / Musyrif</h3>
+<label>Nama Guru</label><input id="namaGuru" placeholder="Contoh: Ustadz Ahmad">
+<label>Halaqah yang Dipegang</label>
+<select id="halaqahGuru"><option>Halaqah A</option><option>Halaqah B</option><option>Halaqah C</option><option>Halaqah D</option></select>
+<label>No WA (628xxx)</label><input id="waGuru" placeholder="628123456789">
+<button class="btn-hijau" style="margin-top:10px" onclick="tambahGuru()">+ Simpan Guru</button>
+</div>
+<div class="card"><h3 style="margin:0">Daftar Guru</h3><div id="listGuru"></div></div>
+</div>
+
+<!-- SISWA -->
+<div id="page-siswa" class="hidden">
+<div class="card">
+<h3 style="margin:0">Tambah Siswa</h3>
+<label>Nama Siswa</label><input id="namaSiswa" placeholder="Nama lengkap">
+<div class="row"><div><label>Kelas</label><select id="kelasSiswa"><option>VII</option><option>VIII</option><option>IX</option></select></div>
+<div><label>Halaqah</label><select id="halaqahSiswa"><option>Halaqah A</option><option>Halaqah B</option><option>Halaqah C</option><option>Halaqah D</option></select></div></div>
+<label>No WA Orang Tua (628xxx)</label><input id="waSiswa" placeholder="628123456789">
+<button class="btn-hijau" style="margin-top:10px" onclick="tambahSiswa()">+ Simpan Siswa</button>
+</div>
+<div class="card"><h3 style="margin:0">Daftar Siswa</h3><div id="listSiswaAll"></div></div>
+</div>
+
+<p style="text-align:center;font-size:12px;color:#888">HalaqahKu • Data tersimpan di HP (LocalStorage) • Bisa dihubungkan ke Apps Script</p>
+</div>
+
+<script>
+// === GANTI DENGAN LINK APPS SCRIPT KAMU JIKA SUDAH ADA ===
+// const URL_APPSCRIPT = "https://script.google.com/macros/s/XXXXX/exec";
+const URL_APPSCRIPT = "";
+
+let siswa = JSON.parse(localStorage.getItem('halaqah_siswa') || '[]');
+let guru = JSON.parse(localStorage.getItem('halaqah_guru') || '[]');
+let setoran = JSON.parse(localStorage.getItem('halaqah_setoran') || '[]');
+
+// Data contoh kalau masih kosong
+if(siswa.length===0){
+  siswa=[
+    {nama:"Ahmad Fauzi",kelas:"VII",halaqah:"Halaqah A",wa:"628123456789"},
+    {nama:"Siti Aisyah",kelas:"VII",halaqah:"Halaqah A",wa:"628123456789"},
+    {nama:"Muhammad Rizki",kelas:"VIII",halaqah:"Halaqah B",wa:"628123456789"},
+    {nama:"Fatimah Zahra",kelas:"IX",halaqah:"Halaqah C",wa:"628123456789"},
+  ];
+  simpan();
+}
+function simpan(){
+  localStorage.setItem('halaqah_siswa',JSON.stringify(siswa));
+  localStorage.setItem('halaqah_guru',JSON.stringify(guru));
+  localStorage.setItem('halaqah_setoran',JSON.stringify(setoran));
+}
+function showTab(nama){
+  ['laporan','guru','siswa'].forEach(t=>{
+    document.getElementById('page-'+t).classList.toggle('hidden', t!==nama);
+    document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active', t===nama);
+  });
+  renderSiswa(); renderGuru(); renderSiswaAll(); renderRekap();
+}
+function renderSiswa(){
+  const k=document.getElementById('filterKelas').value;
+  const h=document.getElementById('filterHalaqah').value;
+  const c=(document.getElementById('cari').value||'').toLowerCase();
+  const hasil=siswa.filter(s=>(!k||s.kelas===k)&&(!h||s.halaqah===h)&&s.nama.toLowerCase().includes(c));
+  document.getElementById('jml').textContent=hasil.length+' siswa';
+  document.getElementById('listSiswa').innerHTML=hasil.map((s,i)=>{
+    const idx=siswa.indexOf(s);
+    return `<div class="siswa">
+      <b>${s.nama}</b> <span class="badge">${s.kelas} • ${s.halaqah}</span><br>
+      <div class="row" style="margin-top:8px">
+        <select id="kat-${idx}"><option>Tilawah</option><option>Hafalan</option><option>Murajaah</option></select>
+        <input id="dari-${idx}" placeholder="Dari: Al-Fatihah:1">
+        <input id="sampai-${idx}" placeholder="Sampai: Al-Fatihah:7">
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input id="nilai-${idx}" placeholder="Nilai 0-100" type="number">
+        <button class="btn-hijau" onclick="simpanSetoran(${idx})">Simpan Setoran</button>
+      </div>
+      <button class="btn-abu" style="margin-top:6px" onclick="kirimWAOrtu(${idx})">Kirim ke WA Ortu</button>
+    </div>`;
+  }).join('') || '<p style="color:#888">Belum ada siswa di filter ini. Tambah di menu Manajemen Siswa.</p>';
+  renderRekap();
+}
+function simpanSetoran(idx){
+  const s=siswa[idx];
+  const kat=document.getElementById('kat-'+idx).value;
+  const dari=document.getElementById('dari-'+idx).value;
+  const sampai=document.getElementById('sampai-'+idx).value;
+  const nilai=document.getElementById('nilai-'+idx).value;
+  if(!dari||!sampai){alert('Isi dulu Dari dan Sampai Surah/Ayat');return;}
+  setoran.push({nama:s.nama,kelas:s.kelas,halaqah:s.halaqah,kat,dari,sampai,nilai,tgl:new Date().toLocaleDateString('id-ID')});
+  simpan(); renderRekap();
+  alert('Setoran '+s.nama+' tersimpan!');
+  // Kalau mau langsung ke Apps Script, aktifkan ini:
+  // if(URL_APPSCRIPT) fetch(URL_APPSCRIPT,{method:'POST',body:JSON.stringify(setoran[setoran.length-1])});
+}
+function renderRekap(){
+  const hariIni=new Date().toLocaleDateString('id-ID');
+  const hari=setoran.filter(x=>x.tgl===hariIni);
+  document.getElementById('rekap').innerHTML=hari.length? `<table><tr><th>Nama</th><th>Setoran</th><th>Nilai</th></tr>${hari.map(x=>`<tr><td>${x.nama}</td><td>${x.kat}: ${x.dari} - ${x.sampai}</td><td>${x.nilai||'-'}</td></tr>`).join('')}</table><p><b>Total hari ini: ${hari.length} setoran</b></p>` : '<p style="color:#888">Belum ada setoran hari ini.</p>';
+}
+function kirimWA(){
+  const hariIni=new Date().toLocaleDateString('id-ID');
+  const hari=setoran.filter(x=>x.tgl===hariIni);
+  let teks=`*REKAP HALAQAHKU - ${hariIni}*\n\n`;
+  if(!hari.length) teks+='Belum ada setoran hari ini.';
+  else hari.forEach(x=>{teks+=`• ${x.nama} (${x.kelas}/${x.halaqah}) - ${x.kat}: ${x.dari} s.d ${x.sampai} | Nilai: ${x.nilai||'-'}\n`;});
+  window.open('https://wa.me/?text='+encodeURIComponent(teks),'_blank');
+}
+function kirimWAOrtu(idx){
+  const s=siswa[idx];
+  const teks=`Assalamu'alaikum, Ayah/Bunda ${s.nama}. Hari ini ananda sudah setoran di HalaqahKu. Jazakumullah khairan.`;
+  window.open('https://wa.me/'+s.wa+'?text='+encodeURIComponent(teks),'_blank');
+}
+function tambahGuru(){
+  const nama=document.getElementById('namaGuru').value.trim();
+  const halaqah=document.getElementById('halaqahGuru').value;
+  const wa=document.getElementById('waGuru').value.trim();
+  if(!nama){alert('Isi nama guru dulu');return;}
+  guru.push({nama,halaqah,wa}); simpan(); renderGuru();
+  document.getElementById('namaGuru').value=''; document.getElementById('waGuru').value='';
+  alert('Guru tersimpan!');
+}
+function renderGuru(){
+  document.getElementById('listGuru').innerHTML=guru.map((g,i)=>`<div class="siswa"><b>${g.nama}</b> <span class="badge">${g.halaqah}</span><br>WA: ${g.wa||'-'}<br><button class="btn-abu" style="margin-top:6px" onclick="hapusGuru(${i})">Hapus</button></div>`).join('') || '<p style="color:#888">Belum ada guru.</p>';
+}
+function hapusGuru(i){ if(confirm('Hapus guru ini?')){guru.splice(i,1);simpan();renderGuru();} }
+function tambahSiswa(){
+  const nama=document.getElementById('namaSiswa').value.trim();
+  const kelas=document.getElementById('kelasSiswa').value;
+  const halaqah=document.getElementById('halaqahSiswa').value;
+  const wa=document.getElementById('waSiswa').value.trim();
+  if(!nama){alert('Isi nama siswa dulu');return;}
+  siswa.push({nama,kelas,halaqah,wa}); simpan(); renderSiswa(); renderSiswaAll();
+  document.getElementById('namaSiswa').value=''; document.getElementById('waSiswa').value='';
+  alert('Siswa tersimpan!');
+}
+function renderSiswaAll(){
+  document.getElementById('listSiswaAll').innerHTML=siswa.map((s,i)=>`<div class="siswa"><b>${s.nama}</b> <span class="badge">${s.kelas} • ${s.halaqah}</span><br>WA Ortu: ${s.wa||'-'}<br><button class="btn-abu" style="margin-top:6px" onclick="hapusSiswa(${i})">Hapus</button></div>`).join('') || '<p style="color:#888">Belum ada siswa.</p>';
+}
+function hapusSiswa(i){ if(confirm('Hapus siswa ini?')){siswa.splice(i,1);simpan();renderSiswa();renderSiswaAll();} }
+
+// Load dari Apps Script jika ada URL-nya
+if(URL_APPSCRIPT){
+  fetch(URL_APPSCRIPT).then(r=>r.json()).then(d=>{ if(Array.isArray(d)&&d.length){siswa=d; simpan(); renderSiswa();} }).catch(()=>{});
+}
+renderSiswa(); renderGuru(); renderSiswaAll();
+</script>
 </body>
 </html>
