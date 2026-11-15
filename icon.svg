@@ -1,0 +1,11 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="110" fill="#14653d"/>
+  <path d="M110 150 Q256 90 402 150 L402 360 Q256 300 110 360 Z"
+        fill="none" stroke="#ffffff" stroke-width="20"/>
+  <path d="M256 135 V340" stroke="#ffffff" stroke-width="16"/>
+  <path d="M145 190 Q200 170 235 190 M277 190 Q330 170 367 190"
+        fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+  <text x="256" y="430" text-anchor="middle"
+        font-size="42" font-weight="bold" fill="#ffffff">HQ</text>
+</svg>
