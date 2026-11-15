@@ -1,0 +1,10 @@
+function doGet() {
+  setupSheets();
+
+  return HtmlService
+    .createHtmlOutputFromFile('Index')
+    .setTitle('HalaqahKu')
+    .setXFrameOptionsMode(
+      HtmlService.XFrameOptionsMode.ALLOWALL
+    );
+}
