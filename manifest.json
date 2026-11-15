@@ -1,0 +1,19 @@
+
+{
+  "name": "HalaqahKu",
+  "short_name": "HalaqahKu",
+  "description": "Aplikasi Monitoring Setoran Al-Qur'an",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e8f5ee",
+  "theme_color": "#14653d",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
